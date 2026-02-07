@@ -1,0 +1,112 @@
+services:
+  # ==================== BANCO DE DADOS ====================
+  postgres:
+    image: postgres:15
+    container_name: loja-veloz-postgres
+    environment:
+      POSTGRES_USER: veloz
+      POSTGRES_PASSWORD: veloz
+      POSTGRES_DB: pedidos
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    networks:
+      - loja-veloz-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U veloz -d pedidos"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # ==================== OBSERVABILIDADE ====================
+  jaeger:
+    image: jaegertracing/all-in-one:1.53
+    container_name: loja-veloz-jaeger
+    environment:
+      COLLECTOR_OTLP_ENABLED: "true"
+    ports:
+      - "16686:16686"  # UI
+      - "4317:4317"    # OTLP gRPC
+      - "4318:4318"    # OTLP HTTP
+    networks:
+      - loja-veloz-network
+
+  prometheus:
+    image: prom/prometheus:v2.48.0
+    container_name: loja-veloz-prometheus
+    volumes:
+      - ./observability/prometheus.yml:/etc/prometheus/prometheus.yml
+    ports:
+      - "9090:9090"
+    networks:
+      - loja-veloz-network
+    depends_on:
+      - api-gateway
+
+  # ==================== SERVIÇOS ====================
+  api-gateway:
+    build: ./services/api-gateway
+    image: loja-veloz-api-gateway:v1.0.0
+    container_name: loja-veloz-api-gateway
+    ports:
+      - "8080:8080"
+    environment:
+      SERVICE_NAME: api-gateway
+      OTEL_EXPORTER_OTLP_ENDPOINT: http://jaeger:4317
+      OTEL_SERVICE_NAME: api-gateway
+    networks:
+      - loja-veloz-network
+    depends_on:
+      - jaeger
+
+  pedidos:
+    build: ./services/pedidos
+    image: loja-veloz-pedidos:v1.0.0
+    container_name: loja-veloz-pedidos
+    environment:
+      SERVICE_NAME: pedidos
+      DATABASE_URL: postgresql://veloz:veloz@postgres:5432/pedidos
+      OTEL_EXPORTER_OTLP_ENDPOINT: http://jaeger:4317
+      OTEL_SERVICE_NAME: pedidos
+    networks:
+      - loja-veloz-network
+    depends_on:
+      postgres:
+        condition: service_healthy
+      jaeger:
+        condition: service_started
+
+  pagamentos:
+    build: ./services/pagamentos
+    image: loja-veloz-pagamentos:v1.0.0
+    container_name: loja-veloz-pagamentos
+    environment:
+      SERVICE_NAME: pagamentos
+      OTEL_EXPORTER_OTLP_ENDPOINT: http://jaeger:4317
+      OTEL_SERVICE_NAME: pagamentos
+    networks:
+      - loja-veloz-network
+    depends_on:
+      - jaeger
+
+  estoque:
+    build: ./services/estoque
+    image: loja-veloz-estoque:v1.0.0
+    container_name: loja-veloz-estoque
+    environment:
+      SERVICE_NAME: estoque
+      OTEL_EXPORTER_OTLP_ENDPOINT: http://jaeger:4317
+      OTEL_SERVICE_NAME: estoque
+    networks:
+      - loja-veloz-network
+    depends_on:
+      - jaeger
+
+# ==================== REDE ====================
+networks:
+  loja-veloz-network:
+    driver: bridge
+    name: loja-veloz-network
+
+# ==================== VOLUMES ====================
+volumes:
+  pgdata:
