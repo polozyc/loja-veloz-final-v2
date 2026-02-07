@@ -2,7 +2,7 @@
 
 Plataforma de e-commerce baseada em microserviços com observabilidade, CI/CD automatizado e infraestrutura como código.
 
-## 🏗️ Arquitetura
+##  Arquitetura
 
 ```
 ┌─────────────────────────────────────────────────┐
@@ -38,7 +38,7 @@ Plataforma de e-commerce baseada em microserviços com observabilidade, CI/CD au
 | jaeger | Tracing distribuído | 16686 (UI) |
 | prometheus | Métricas | 9090 |
 
-## 🚀 Execução Local
+##  Execução Local
 
 ### Pré-requisitos
 - Docker >= 20.10
@@ -62,7 +62,7 @@ docker compose ps
 docker compose down
 ```
 
-## 🔗 Endpoints
+##  Endpoints
 
 | Endpoint | URL | Descrição |
 |----------|-----|----------|
@@ -71,7 +71,7 @@ docker compose down
 | Jaeger UI | http://localhost:16686 | Tracing distribuído |
 | Prometheus | http://localhost:9090 | Dashboard de métricas |
 
-## 📦 Estrutura do Projeto
+##  Estrutura do Projeto
 
 ```
 ├── .github/workflows/     # CI/CD pipelines
@@ -94,7 +94,7 @@ docker compose down
 └── docker-compose.yml     # Orquestração local
 ```
 
-## ☁️ Kubernetes
+##  Kubernetes
 
 ### Deploy no cluster
 
@@ -135,7 +135,7 @@ curl http://localhost:30080/health
   - `readOnlyRootFilesystem: true`
   - `capabilities.drop: ALL`
 
-## 📊 Observabilidade
+##  Observabilidade
 
 ### Métricas (Prometheus)
 Todos os serviços expõem métricas no endpoint `/metrics`:
@@ -152,7 +152,7 @@ Tracing distribuído com OpenTelemetry:
 - UI disponível em http://localhost:16686
 - Protocolo OTLP (gRPC: 4317, HTTP: 4318)
 
-## 🚀 CI/CD
+##  CI/CD
 
 Pipeline automatizado com GitHub Actions:
 
@@ -166,7 +166,7 @@ Pipeline automatizado com GitHub Actions:
 - `DOCKERHUB_USERNAME`: Usuário do Docker Hub
 - `DOCKERHUB_TOKEN`: Token de acesso do Docker Hub
 
-## 📈 Escalabilidade
+##  Escalabilidade
 
 ### Horizontal Pod Autoscaler (HPA)
 Cada serviço possui HPA configurado:
@@ -179,7 +179,7 @@ Cada serviço possui HPA configurado:
 - `maxSurge: 1` - Máximo 1 pod extra durante update
 - `maxUnavailable: 0` - Zero downtime
 
-## 🛠️ Tecnologias
+##  Tecnologias
 
 - **Linguagem**: Python 3.11
 - **Framework**: Flask
@@ -190,6 +190,6 @@ Cada serviço possui HPA configurado:
 - **Observabilidade**: Prometheus + Jaeger
 - **IaC**: Terraform
 
-## 📝 Licença
+##  Licença
 
 MIT License
