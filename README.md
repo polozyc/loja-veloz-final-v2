@@ -121,7 +121,7 @@ kubectl get hpa
 curl http://localhost:30080/health
 ```
 
-## 🔒 Segurança
+##  Segurança
 
 ### Containers
 - **Usuário não-root**: Todos os containers rodam com `appuser`
